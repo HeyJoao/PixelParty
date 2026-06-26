@@ -43,11 +43,8 @@ function setupForm() {
       return;
     }
 
-    formMessage.textContent = `Welcome, ${username}! Ready to join room ${room}.`;
-
-    // TODO: connect this with backend endpoint when available.
-    // Example:
-    // fetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, room }) })
+    const query = new URLSearchParams({ username, room });
+    window.location.href = `./game.html?${query.toString()}`;
   });
 }
 

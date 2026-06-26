@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PixelParty</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1 class="logo">PixelParty</h1>
+        <nav class="nav">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#join">Join</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-content">
+          <div>
+            <p class="eyebrow">Create. Play. Share.</p>
+            <h2>Welcome to PixelParty</h2>
+            <p>
+              A playful pixel experience where friends can create together in
+              real time. This frontend is built with only HTML, CSS, and
+              JavaScript.
+            </p>
+            <div class="hero-actions">
+              <button id="startBtn" class="btn btn-primary">Start Now</button>
+              <a href="#features" class="btn btn-outline">Learn More</a>
+            </div>
+          </div>
+          <div class="hero-card" aria-hidden="true">
+            <div class="pixel-grid" id="pixelGrid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <div class="container">
+          <h3>Features</h3>
+          <div class="cards">
+            <article class="card">
+              <h4>Real-time party vibes</h4>
+              <p>Collaborate with your friends in a fast and fun interface.</p>
+            </article>
+            <article class="card">
+              <h4>Simple controls</h4>
+              <p>Easy interactions that work on desktop and mobile.</p>
+            </article>
+            <article class="card">
+              <h4>Backend-ready</h4>
+              <p>
+                Clean JavaScript structure ready to connect with your Python API.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" class="section section-alt">
+        <div class="container">
+          <h3>How it works</h3>
+          <ol class="steps">
+            <li>Create or join a room.</li>
+            <li>Start placing pixels and interact with others.</li>
+            <li>Save and share your masterpiece.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="join" class="section">
+        <div class="container join-box">
+          <h3>Join the PixelParty</h3>
+          <p>Hook this form to your backend when ready.</p>
+          <form id="joinForm" class="join-form">
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Your name"
+              required
+            />
+            <input
+              type="text"
+              id="room"
+              name="room"
+              placeholder="Room code"
+              required
+            />
+            <button type="submit" class="btn btn-primary">Enter</button>
+          </form>
+          <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> PixelParty. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script src="./js/app.js"></script>
+  </body>
+</html>

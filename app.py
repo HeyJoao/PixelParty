@@ -132,7 +132,7 @@ def on_entrar_sala(dados):
 def on_palpite(dados):
     pin = dados.get("pin")
     palpite = dados.get("palpite", "").strip()
-    nickname = dados.get("nickname") # Recuperamos direto do payload do Front-end
+    nickname = dados.get("nickname") # Agora o backend pega o nickname do jeito certo!
 
     if not nickname:
         emit("erro", {"mensagem": "Jogador não identificado no palpite."})
@@ -143,31 +143,32 @@ def on_palpite(dados):
         emit("erro", {"mensagem": "Sala ou partida não encontrada."})
         return
 
-    # Despacha corretamente de acordo com a assinatura do método da game_logic
-    if isinstance(sala.partida, PartidaSolo):
-        # PartidaSolo espera apenas o palpite
-        resultado = sala.partida.processar_palpite(palpite)
-    else:
-        # PartidaMultiplayer espera o nickname e o palpite
-        resultado = sala.partida.processar_palpite(nickname, palpite)
+    try:
+        # Direciona para Solo ou Multiplayer corretamente
+        if isinstance(sala.partida, PartidaSolo):
+            resultado = sala.partida.processar_palpite(palpite)
+        else:
+            resultado = sala.partida.processar_palpite(nickname, palpite)
+    except Exception as e:
+        print(f"Erro interno no jogo: {e}")
+        return
 
     if "erro" in resultado:
         emit("erro", resultado)
         return
 
-    # Resposta individual (vidas, resultado) — só para quem jogou
+    # Devolve o resultado (tira vida, revela azulejo, etc)
     emit("resultado_palpite", resultado["resposta_individual"])
     
-    # Broadcast do placar parcial para todos na sala
+    # Atualiza o placar
     if "placar_parcial" in resultado:
         emit("placar_atualizado", {"placar": resultado["placar_parcial"]}, to=pin)
 
-    # Se a rodada ou a partida acabou, avisa todos
+    # Verifica se alguém ganhou ou a rodada/partida acabou
     if resultado.get("broadcast") is not None:
         broadcast = resultado["broadcast"]
         emit("evento_rodada", broadcast, to=pin)
 
-        # Fim de partida: salva pontuações no banco
         if broadcast.get("evento") == "partida_encerrada":
             with app.app_context():
                 try:
@@ -178,7 +179,6 @@ def on_palpite(dados):
                     db.session.commit()
                 except Exception as e:
                     db.session.rollback()
-                    print(f"Erro ao salvar pontuação: {e}")
             remover_sala(pin)
 
 # 👇 Novo evento para ouvir o tempo esgotado que o Frontend manda

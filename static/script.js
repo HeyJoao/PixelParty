@@ -557,9 +557,15 @@ function iniciarTimer(segundos) {
       pararTimer();
       statusMsg.textContent = "⏱ Tempo esgotado!";
       statusMsg.style.color = "var(--warn)";
-      // Desabilita input — aguarda evento do servidor para avançar rodada
       guessInput.disabled = true;
       btnEnviar.disabled  = true;
+      
+      // palpite errado proposital para destravar a rodada do Multiplayer!
+      socket.emit("palpite", {
+        pin: state.pinAtual,
+        palpite: "@@TEMPO_ESGOTADO@@",
+        nickname: state.nickname
+      });
     }
   }, 1000);
 }

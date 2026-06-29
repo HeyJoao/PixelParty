@@ -2,15 +2,15 @@
  * script.js — PixelParty Frontend v2
  *
  * Estratégia de integração com o back-end:
- *   - Solo usa o mesmo fluxo de sala que o multi (criar_sala → iniciar_partida).
- *     A sala é privada (1 jogador). Todos os eventos socket.io são compartilhados.
- *   - Eventos emitidos pelo FRONT que o BACK ouve:
- *       criar_sala, entrar_sala, iniciar_partida, palpite
- *   - Eventos emitidos pelo BACK que o FRONT ouve:
- *       sala_criada, jogador_entrou, partida_iniciada,
- *       resultado_palpite, placar_atualizado, evento_rodada, erro
- *   - Chamadas REST: POST /jogador, GET /temas, POST /temas,
- *                    POST /temas/:id/imagens, GET /ranking, GET /sessao
+ * - Solo usa o mesmo fluxo de sala que o multi (criar_sala → iniciar_partida).
+ * A sala é privada (1 jogador). Todos os eventos socket.io são compartilhados.
+ * - Eventos emitidos pelo FRONT que o BACK ouve:
+ * criar_sala, entrar_sala, iniciar_partida, palpite
+ * - Eventos emitidos pelo BACK que o FRONT ouve:
+ * sala_criada, jogador_entrou, partida_iniciada,
+ * resultado_palpite, placar_atualizado, evento_rodada, erro
+ * - Chamadas REST: POST /jogador, GET /temas, POST /temas,
+ * POST /temas/:id/imagens, GET /ranking, GET /sessao
  *
  * O front NUNCA gerencia vidas, gabaritos ou pontuação.
  * Toda a lógica de jogo vive no game_logic.py (servidor).
@@ -489,7 +489,7 @@ function setupTelaJogo(dados) {
     pararTimer();
   }
 
-  // 👇 CORREÇÃO: Pegando o nome correto da variável do banco de dados (url_imagem)
+  // 👇 Pegando o nome correto da variável do banco de dados (url_imagem)
   const urlCorreta = dados.imagem?.url_imagem || dados.imagem?.url;
   if (urlCorreta) {
     carregarImagem(urlCorreta);
@@ -505,14 +505,11 @@ function setupTelaJogo(dados) {
 // =============================================================
 
 function carregarImagem(urlOriginal) {
-  // 1. Criamos a URL apontando para o nosso servidor Python (Proxy)
-  const proxyUrl = "http://127.0.0.1:5000/proxy-imagem?url=" + encodeURIComponent(urlOriginal);
+  // Como agora usamos imagens locais (/static/img/...), NÃO precisamos mais de proxy!
+  gameImg.removeAttribute("crossOrigin"); // Removemos isso para evitar bloqueios de CORS desnecessários
   
-  // 2. Avisamos o navegador para permitir o uso da imagem sem bloquear a tela
-  gameImg.crossOrigin = "Anonymous"; 
-  
-  // 3. Colocamos a imagem para carregar usando o nosso Proxy
-  gameImg.src = proxyUrl;
+  // Carrega a imagem direta usando o caminho servido pelo seu app
+  gameImg.src = urlOriginal;
   
   state.tilesRevelados = 0;
   
@@ -605,7 +602,7 @@ socket.on("resultado_palpite", (dados) => {
     statusMsg.textContent = `✅ Acertou! +${dados.pontos_ganhos || 0} pts`;
     statusMsg.style.color = "var(--success)";
 
-    // 👇 CORREÇÃO: Buscando a URL correta da próxima imagem
+    // 👇 Buscando a URL correta da próxima imagem
     const urlProxima = dados.proxima_imagem?.url_imagem || dados.proxima_imagem?.url;
     
     if (dados.jogo_encerrado) {
@@ -638,7 +635,7 @@ socket.on("resultado_palpite", (dados) => {
       statusMsg.style.color = "var(--danger)";
     }
 
-    // 👇 CORREÇÃO: Buscando a URL correta da próxima imagem
+    // 👇 Buscando a URL correta da próxima imagem
     const urlProxima = dados.proxima_imagem?.url_imagem || dados.proxima_imagem?.url;
 
     if (dados.jogo_encerrado) {

@@ -582,10 +582,11 @@ function enviarPalpite() {
   guessInput.value      = "";
   statusMsg.textContent = "";
 
-  // Em ambos os modos, o evento é "palpite" com o PIN da sala
+  // Em ambos os modos, o evento é "palpite" com o PIN e o Nickname
   socket.emit("palpite", {
-    pin:     state.pinAtual,
-    palpite: texto,
+    pin:      state.pinAtual,
+    palpite:  texto,
+    nickname: state.nickname // 👈 A chave do sucesso! Agora o servidor não se perde.
   });
 }
 

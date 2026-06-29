@@ -222,6 +222,11 @@ def _jogador_da_sessao():
         return None
     return Jogador.query.filter_by(session_token=token).first()
 
+@app.route("/sessao", methods=["GET"])
+def rota_sessao_fantasma():
+    """ Rota de fallback para evitar erro 404 no front-end """
+    return jsonify({"nickname": ""}), 200
+
 @app.route("/temas", methods=["GET"])
 def listar_temas():
     """Lista todos os temas disponíveis com contagem de imagens."""
@@ -419,7 +424,7 @@ def on_palpite(dados):
                     if j:
                         j.adicionar_pontos(entrada["pontuacao"])
             remover_sala(pin)
-            
+
 @socketio.on("disconnect")
 def on_disconnect():
     """Varredura de segurança: Limpa o lobby se o host fechar a aba (Fuga de Memória)."""

@@ -812,6 +812,28 @@ socket.on("erro", (dados) => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("button").forEach(btn => {
+    const texto = btn.textContent.toLowerCase();
+    if (texto.includes("jogar novamente") || texto.includes("jogar de novo")) {
+      
+      // Clona o botão para remover qualquer evento antigo que estivesse quebrando o jogo
+      const novoBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(novoBtn, btn);
+      
+      novoBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Limpa o PIN da partida velha, mas MANTÉM o nickname intacto
+        state.pinAtual = null;
+        state.ehHost = false;
+        
+        // Volta para a Home pronto para uma nova rodada
+        showScreen("home"); 
+      });
+    }
+  });
+});
+
 // =============================================================
 // 25. INICIALIZAÇÃO
 // =============================================================

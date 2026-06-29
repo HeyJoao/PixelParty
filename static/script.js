@@ -793,7 +793,7 @@ btnFinalizar.addEventListener("click", () => {
 // =============================================================
 // 24. ERROS DO SERVIDOR
 // =============================================================
-
+/*
 socket.on("erro", (dados) => {
   const msg = dados.mensagem || dados.erro || "Erro desconhecido do servidor.";
   console.error("[PixelParty] erro:", msg);
@@ -811,7 +811,7 @@ socket.on("erro", (dados) => {
     showScreen("home");
   }
 });
-
+*/
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("button").forEach(btn => {
     const texto = btn.textContent.toLowerCase();

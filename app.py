@@ -131,8 +131,11 @@ def on_entrar_sala(dados):
 @socketio.on("palpite")
 def on_palpite(dados):
     pin = dados.get("pin")
-    palpite = dados.get("palpite", "").strip()
-    nickname = dados.get("nickname") # Agora o backend pega o nickname do jeito certo!
+    
+    # 🔴 FIX CRÍTICO: Evita TypeError caso "palpite" não venha do JS
+    palpite_cru = dados.get("palpite")
+    palpite = str(palpite_cru).strip() if palpite_cru is not None else ""
+    nickname = dados.get("nickname")
 
     if not nickname:
         emit("erro", {"mensagem": "Jogador não identificado no palpite."})
@@ -144,31 +147,32 @@ def on_palpite(dados):
         return
 
     try:
-        # Direciona para Solo ou Multiplayer corretamente
+        # Resolve a confusão entre modo Solo e Multiplayer!
         if isinstance(sala.partida, PartidaSolo):
             resultado = sala.partida.processar_palpite(palpite)
         else:
             resultado = sala.partida.processar_palpite(nickname, palpite)
     except Exception as e:
-        print(f"Erro interno no jogo: {e}")
+        print(f"Erro interno ao processar palpite: {e}")
         return
 
     if "erro" in resultado:
         emit("erro", resultado)
         return
 
-    # Devolve o resultado (tira vida, revela azulejo, etc)
+    # Devolve o resultado individual (TIRA A VIDA, REVELA AZULEJO)
     emit("resultado_palpite", resultado["resposta_individual"])
     
     # Atualiza o placar
     if "placar_parcial" in resultado:
         emit("placar_atualizado", {"placar": resultado["placar_parcial"]}, to=pin)
 
-    # Verifica se alguém ganhou ou a rodada/partida acabou
+    # Verifica se a rodada acabou ou alguém zerou a partida
     if resultado.get("broadcast") is not None:
         broadcast = resultado["broadcast"]
         emit("evento_rodada", broadcast, to=pin)
 
+        # Fim de partida: salva as pontuações e destrói a sala
         if broadcast.get("evento") == "partida_encerrada":
             with app.app_context():
                 try:
@@ -179,6 +183,7 @@ def on_palpite(dados):
                     db.session.commit()
                 except Exception as e:
                     db.session.rollback()
+                    print(f"Erro ao salvar pontuação: {e}")
             remover_sala(pin)
 
 # 👇 Novo evento para ouvir o tempo esgotado que o Frontend manda
@@ -414,6 +419,23 @@ def on_palpite(dados):
                     if j:
                         j.adicionar_pontos(entrada["pontuacao"])
             remover_sala(pin)
+            
+@socketio.on("disconnect")
+def on_disconnect():
+    """Varredura de segurança: Limpa o lobby se o host fechar a aba (Fuga de Memória)."""
+    salas_para_remover = []
+    
+    # Como não temos um mapeamento direto request.sid -> jogador, 
+    # verificamos a integridade das salas de forma global
+    for pin, sala in list(lobby.items()):
+        # O comportamento padrão do SocketIO fará o broadcast de desconexão.
+        # Aqui, vamos garantir que salas vazias morram.
+        if hasattr(sala, 'jogadores') and len(sala.jogadores) == 0:
+            salas_para_remover.append(pin)
+
+    for pin in salas_para_remover:
+        remover_sala(pin)
+        print(f"🧹 Sala zumbi {pin} varrida da memória.")
 
 # ---------------------------------------------------------------------------
 # Ponto de entrada para desenvolvimento local

@@ -560,12 +560,15 @@ function iniciarTimer(segundos) {
       guessInput.disabled = true;
       btnEnviar.disabled  = true;
       
-      // palpite errado proposital para destravar a rodada do Multiplayer!
-      socket.emit("palpite", {
-        pin: state.pinAtual,
-        palpite: "@@TEMPO_ESGOTADO@@",
-        nickname: state.nickname
-      });
+      // 🔴 FIX CRÍTICO: Apenas o HOST avisa o servidor que o tempo acabou.
+      // Impede que 5 pessoas pulem 5 rodadas ao mesmo tempo.
+      if (state.ehHost) {
+        socket.emit("palpite", {
+          pin: state.pinAtual,
+          palpite: "@@TEMPO_ESGOTADO@@",
+          nickname: state.nickname
+        });
+      }
     }
   }, 1000);
 }

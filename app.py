@@ -37,11 +37,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 # async_mode='threading' para desenvolvimento local está correto
-socketio = SocketIO(
-    app, 
-    async_mode="threading", 
-    cors_allowed_origins=["http://127.0.0.1:5500", "http://localhost:5500"]
-)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route("/")
 def renderizar_home():

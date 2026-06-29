@@ -1,0 +1,486 @@
+/* ==========================================================
+   PIXELPARTY — style.css
+   Dark theme com glassmorphism. Layout único via .painel.
+   Responsivo: desktop lateral | mobile empilhado.
+   ========================================================== */
+
+/* ---------- Tokens ---------- */
+:root {
+  --bg-deep:    #080d17;
+  --bg-mid:     #0f1a2e;
+  --glass:      rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --text:       #e2e8f0;
+  --muted:      #64748b;
+  --accent:     #38bdf8;       /* sky-400  */
+  --accent-2:   #818cf8;       /* indigo-400 */
+  --success:    #34d399;       /* emerald-400 */
+  --danger:     #f87171;       /* red-400 */
+  --warn:       #fbbf24;       /* amber-400 */
+  --tile-bg:    #0c1422;
+  --shadow:     0 24px 60px rgba(0,0,0,.55);
+  --radius:     20px;
+  --radius-sm:  12px;
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  min-height: 100vh;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 10% 15%, rgba(56,189,248,.18) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 5%,  rgba(129,140,248,.15) 0%, transparent 35%),
+    radial-gradient(ellipse at 60% 90%, rgba(99,102,241,.12)  0%, transparent 40%),
+    linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* ============================================================
+   PAINEL ÚNICO
+   ============================================================ */
+.painel {
+  position: relative;
+  width: min(840px, 100%);
+  min-height: 540px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: var(--radius);
+  padding: 40px 44px;
+  box-shadow: var(--shadow);
+  /* Garante que apenas UMA tela é visível de cada vez */
+  overflow: hidden;
+}
+
+/* ============================================================
+   TELAS
+   ============================================================ */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* "hidden" utilitário para qualquer elemento */
+.hidden { display: none !important; }
+
+/* ============================================================
+   TIPOGRAFIA GLOBAL
+   ============================================================ */
+h1 {
+  font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+  font-weight: 900;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 32px rgba(56,189,248,.35);
+  margin-bottom: 28px;
+  letter-spacing: -0.5px;
+}
+
+label {
+  display: block;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   LOGO NA HOME
+   ============================================================ */
+.logo {
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  margin-bottom: 32px;
+}
+
+.logo span { color: #fff; -webkit-text-fill-color: #fff; }
+
+/* ============================================================
+   HOME LAYOUT  (two-column desktop, stacked mobile)
+   ============================================================ */
+.home-layout {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+.home-left  { flex: 1; }
+.home-right { width: 260px; flex-shrink: 0; }
+
+.home-sub {
+  font-size: .9rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Stack de botões verticais com altura distribuída */
+.btn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-stack button {
+  width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+}
+
+/* ============================================================
+   INPUTS E SELECTS
+   ============================================================ */
+.input-group { display: flex; flex-direction: column; margin-bottom: 14px; }
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 13px 16px;
+  background: rgba(8, 13, 23, .65);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: .95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56,189,248,.18);
+}
+select option { background: #0f1a2e; }
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+button {
+  cursor: pointer;
+  padding: 13px 22px;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #0a1020;
+  box-shadow: 0 4px 16px rgba(56,189,248,.25);
+  transition: transform .15s, box-shadow .15s, opacity .15s;
+}
+button:hover  { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(56,189,248,.38); }
+button:active { transform: translateY(0); }
+button:disabled { opacity: .45; cursor: default; transform: none; }
+
+/* Botão secundário */
+.btn-sec {
+  background: rgba(255,255,255,.07);
+  color: var(--text);
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,.1);
+}
+.btn-sec:hover { background: rgba(255,255,255,.13); box-shadow: none; }
+
+/* Linha de botões lado a lado */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.btn-row button { flex: 1; }
+
+/* Botão copiar PIN (pequeno) */
+.btn-copy {
+  background: transparent;
+  box-shadow: none;
+  color: var(--accent);
+  font-size: 1.2rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(56,189,248,.3);
+}
+.btn-copy:hover { background: rgba(56,189,248,.1); transform: none; }
+
+/* ============================================================
+   CARD DE FORMULÁRIO (telas internas)
+   ============================================================ */
+.form-card {
+  width: min(420px, 100%);
+  margin: 0 auto;
+}
+
+/* ============================================================
+   MENSAGENS
+   ============================================================ */
+.msg-erro {
+  color: var(--danger);
+  font-size: .84rem;
+  font-weight: 600;
+  margin: 4px 0 8px;
+}
+.msg-info {
+  color: var(--muted);
+  font-size: .88rem;
+}
+.sep-label {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  margin: 10px 0 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+
+/* ============================================================
+   LOBBY
+   ============================================================ */
+.pin-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px dashed rgba(56,189,248,.5);
+  background: rgba(56,189,248,.05);
+  border-radius: var(--radius-sm);
+  padding: 18px 22px;
+}
+.pin-label { color: var(--muted); font-size: .85rem; }
+.pin-display strong {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: var(--accent);
+}
+
+.lista-players {
+  list-style: none;
+  background: rgba(0,0,0,.25);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 6px;
+  min-height: 60px;
+}
+.lista-players li {
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  font-size: .9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lista-players li:last-child { border-bottom: none; }
+.player-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+.player-host { color: var(--warn); font-size: .72rem; font-weight: 700; margin-left:auto; }
+
+/* ============================================================
+   TELA DE JOGO
+   ============================================================ */
+.game-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.hud-chip {
+  background: rgba(0,0,0,.3);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: .85rem;
+  font-weight: 700;
+}
+.vidas-chip { color: var(--danger); }
+
+/* Wrapper da imagem */
+.image-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 290px;
+  margin: 0 auto 18px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(0,0,0,.4);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+#gameImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Grade de 6 azulejos sobrepostos */
+.tiles-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows:    repeat(2, 1fr);
+  gap: 2px;
+  z-index: 10;
+}
+
+.tile {
+  background: var(--tile-bg);
+  border: 1px solid rgba(255,255,255,.04);
+  transition: opacity .35s ease;
+}
+
+.tile.revelado {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Área de palpite */
+.guess-area {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.guess-area input { flex: 1; }
+
+/* Mensagem de status */
+.status-msg {
+  text-align: center;
+  font-size: .9rem;
+  font-weight: 600;
+  min-height: 22px;
+  margin: 8px 0;
+}
+
+/* Placar multi */
+.placar-multi {
+  width: 100%;
+  max-width: 500px;
+  margin: 10px auto 0;
+  background: rgba(0,0,0,.25);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+.placar-titulo {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: .6px;
+  margin-bottom: 8px;
+}
+.placar-multi ul { list-style: none; }
+.placar-multi li {
+  display: flex;
+  justify-content: space-between;
+  font-size: .85rem;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.placar-multi li:last-child { border-bottom: none; }
+.placar-done { color: var(--muted); }
+
+/* ============================================================
+   SCORE FINAL
+   ============================================================ */
+.score-final {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+}
+.score-num {
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+}
+.score-label { color: var(--muted); font-size: .9rem; }
+
+/* ============================================================
+   PÓDIO
+   ============================================================ */
+#podiumArea {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.podium-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.25);
+}
+.podium-medal { font-size: 1.6rem; min-width: 36px; text-align: center; }
+.podium-nick  { font-weight: 700; flex: 1; }
+.podium-pts   { font-weight: 900; color: var(--accent); font-size: 1.1rem; }
+
+/* ============================================================
+   RANKING TABLE
+   ============================================================ */
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+.ranking-table th {
+  color: var(--accent);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(56,189,248,.25);
+}
+.ranking-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.ranking-table tr:last-child td { border-bottom: none; }
+
+/* ============================================================
+   RESPONSIVO — MOBILE (≤ 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  .painel { padding: 28px 20px; }
+
+  .home-layout {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .home-right { width: 100%; }
+
+  .btn-stack { gap: 10px; }
+  .btn-stack button { padding: 15px; }
+
+  .image-wrap { height: 220px; }
+
+  .game-header { gap: 6px; }
+  .hud-chip { font-size: .78rem; padding: 5px 10px; }
+
+  .guess-area { flex-direction: column; }
+}

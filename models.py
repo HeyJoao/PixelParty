@@ -11,6 +11,7 @@ Conceito aplicado — Composição/Agregação (ORM):
   Isso espelha a classe BancoDeImagens de game_logic.py no nível do banco.
 """
 
+import secrets
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -27,13 +28,20 @@ class Jogador(db.Model):
     nickname = db.Column(db.String(80), unique=True, nullable=False)
     pontuacao_global = db.Column(db.Integer, default=0, nullable=False)
 
+    session_token = db.Column(db.String(64), unique=True, nullable=False, default=lambda: secrets.token_hex(32))
     # Um jogador pode criar vários temas
     temas = db.relationship("TemaCustomizado", back_populates="criador", lazy="select")
 
     def adicionar_pontos(self, pontos: int) -> None:
         """Incrementa a pontuação do jogador e persiste."""
-        self.pontuacao_global += pontos
+        self.pontuacao_global += max(pontos, 0)
         db.session.commit()
+
+    def renovar_token(self) -> str:
+        """Gera e salva um novo session_token (útil para logout/segurança)."""
+        self.session_token = secrets.token_hex(32)
+        db.session.commit()
+        return self.session_token
 
     def to_dict(self) -> dict:
         return {
@@ -90,21 +98,30 @@ class Imagem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     url_imagem = db.Column(db.String(500), nullable=False)
-    palavra_chave = db.Column(db.String(100), nullable=False)  # gabarito
-    dica_texto = db.Column(db.String(255), nullable=True)
+    palavras_chave = db.Column(db.String(500), nullable=False)  # gabarito
 
     # FK → TemasCustomizados
     tema_id = db.Column(db.Integer, db.ForeignKey("temas_customizados.id"), nullable=False)
     tema = db.relationship("TemaCustomizado", back_populates="imagens")
 
+    def lista_gabaritos(self) -> list[str]:
+        return [p.strip().lower() for p in self.palavras_chave.split(",") if p.strip()]
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "url_imagem": self.url_imagem,
-            "palavra_chave": self.palavra_chave,
-            "dica_texto": self.dica_texto,
             "tema_id": self.tema_id,
         }
-
+        
+    def to_dict_admin(self) -> dict:
+        """Serialização completa para rotas administrativas de cadastro."""
+        return {
+            "id":             self.id,
+            "url_imagem":     self.url_imagem,
+            "palavras_chave": self.palavras_chave,
+            "tema_id":        self.tema_id,
+        }
+    
     def __repr__(self) -> str:
-        return f"<Imagem '{self.palavra_chave}' | tema_id={self.tema_id}>"
+        return f"<Imagem '{self.palavras_chave}' | tema_id={self.tema_id}>"

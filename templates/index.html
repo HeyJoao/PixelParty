@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PixelParty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <div class="painel">
+
+    <!-- ===================================================
+         TELA HOME
+    ==================================================== -->
+    <div id="homeScreen" class="screen active">
+      <h1 class="logo">Pixel<span>Party</span></h1>
+
+      <div class="home-layout">
+        <!-- Coluna esquerda: username -->
+        <div class="home-left">
+          <p class="home-sub">Bem-vindo ao jogo de adivinhação de imagens!</p>
+          <div class="input-group">
+            <label for="usernameInput">Seu apelido</label>
+            <input id="usernameInput" type="text" placeholder="Ex: pixel_mestre" maxlength="20" autocomplete="off" />
+          </div>
+          <p id="homeMsg" class="msg-erro hidden"></p>
+        </div>
+
+        <!-- Coluna direita: botões de navegação -->
+        <div class="home-right">
+          <!-- Menu principal -->
+          <div id="menuPrincipal" class="btn-stack">
+            <button id="btnJogar">🎮 JOGAR</button>
+            <button id="btnRankingMenu">🏆 RANKING</button>
+            <button id="btnCriarMenu">➕ CRIAR SALA</button>
+          </div>
+
+          <!-- Sub-menu: Solo ou Multi -->
+          <div id="menuJogar" class="btn-stack hidden">
+            <button id="btnSolo">👤 Solo</button>
+            <button id="btnMulti">👥 Multiplayer</button>
+            <button id="btnVoltarMenu" class="btn-sec">← Voltar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA CONFIG SOLO
+    ==================================================== -->
+    <div id="soloConfigScreen" class="screen hidden">
+      <h1>Modo Solo</h1>
+      <div class="form-card">
+        <div class="input-group">
+          <label for="temaSelectSolo">Tema</label>
+          <select id="temaSelectSolo">
+            <option value="">Carregando temas...</option>
+            <option value="cadastrar">➕ Cadastrar novo tema</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="rodadasSolo">Rodadas</label>
+          <input id="rodadasSolo" type="number" value="5" min="1" max="20" />
+        </div>
+        <p id="soloMsg" class="msg-erro hidden"></p>
+        <div class="btn-row">
+          <button id="btnIniciarSolo">▶ Iniciar</button>
+          <button class="btn-sec btn-voltar-home">← Voltar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA ENTRAR MULTIPLAYER (via PIN)
+    ==================================================== -->
+    <div id="joinScreen" class="screen hidden">
+      <h1>Entrar na Sala</h1>
+      <div class="form-card">
+        <div class="input-group">
+          <label for="pinInput">Código PIN da sala</label>
+          <input id="pinInput" type="text" placeholder="Ex: A1B2C3" maxlength="6"
+                 autocomplete="off" style="text-transform:uppercase; letter-spacing: 4px; font-size:1.4rem; text-align:center;" />
+        </div>
+        <p id="joinMsg" class="msg-erro hidden"></p>
+        <div class="btn-row">
+          <button id="btnEntrar">Entrar</button>
+          <button class="btn-sec btn-voltar-home">← Voltar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA CRIAR SALA MULTIPLAYER
+    ==================================================== -->
+    <div id="createScreen" class="screen hidden">
+      <h1>Criar Sala</h1>
+      <div class="form-card">
+        <div class="input-group">
+          <label for="temaSelectMulti">Tema da partida</label>
+          <select id="temaSelectMulti">
+            <option value="">Carregando temas...</option>
+            <option value="cadastrar">➕ Cadastrar novo tema</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="rodadasMulti">Total de rodadas</label>
+          <input id="rodadasMulti" type="number" value="5" min="1" max="20" />
+        </div>
+        <p id="createMsg" class="msg-erro hidden"></p>
+        <div class="btn-row">
+          <button id="btnGerarSala">Gerar Código</button>
+          <button class="btn-sec btn-voltar-home">← Voltar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA LOBBY (SALA DE ESPERA)
+    ==================================================== -->
+    <div id="lobbyScreen" class="screen hidden">
+      <h1>Sala de Espera</h1>
+      <div class="form-card">
+        <div class="pin-display">
+          <span class="pin-label">PIN da sala</span>
+          <strong id="lobbyPin">------</strong>
+          <button id="btnCopiarPin" class="btn-copy" title="Copiar PIN">📋</button>
+        </div>
+
+        <div class="input-group" style="margin-top:16px;">
+          <label>Jogadores conectados</label>
+          <ul id="listaJogadores" class="lista-players"></ul>
+        </div>
+
+        <p id="lobbyMsg" class="msg-info" style="text-align:center; margin-top:8px;">
+          Aguardando o host iniciar…
+        </p>
+
+        <div class="btn-row" style="margin-top:16px;">
+          <!-- Só aparece para o host -->
+          <button id="btnIniciarMulti" class="hidden">▶ Iniciar Partida</button>
+          <button class="btn-sec btn-voltar-home">Sair da Sala</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA DE JOGO (SOLO E MULTI)
+    ==================================================== -->
+    <div id="gameScreen" class="screen hidden">
+      <!-- Header do jogo -->
+      <div class="game-header">
+        <!-- Timer: só aparece no multi -->
+        <div id="timerBox" class="hud-chip hidden">⏱ <span id="timerVal">60</span>s</div>
+        <div class="hud-chip">⭐ <span id="scoreVal">0</span></div>
+        <div class="hud-chip vidas-chip">❤️ <span id="vidasVal">3</span></div>
+        <div id="rodadaInfo" class="hud-chip">Rodada <span id="rodadaVal">1</span>/<span id="rodadaTotal">5</span></div>
+      </div>
+
+      <!-- Imagem com azulejos -->
+      <div class="image-wrap">
+        <img id="gameImg" src="" alt="Adivinhe a imagem" />
+        <!-- 6 azulejos sobrepostos -->
+        <div class="tiles-grid" id="tilesGrid">
+          <div class="tile" id="tile-0"></div>
+          <div class="tile" id="tile-1"></div>
+          <div class="tile" id="tile-2"></div>
+          <div class="tile" id="tile-3"></div>
+          <div class="tile" id="tile-4"></div>
+          <div class="tile" id="tile-5"></div>
+        </div>
+      </div>
+
+      <!-- Área de palpite -->
+      <div class="guess-area">
+        <input id="guessInput" type="text" placeholder="Digite seu palpite…" autocomplete="off" />
+        <button id="btnEnviar">Enviar</button>
+      </div>
+
+      <p id="statusMsg" class="status-msg"></p>
+
+      <!-- Placar de jogadores (só visível no multi) -->
+      <div id="placarMulti" class="placar-multi hidden">
+        <p class="placar-titulo">Placar da Rodada</p>
+        <ul id="placarLista"></ul>
+      </div>
+
+      <button id="btnFinalizar" class="btn-sec" style="margin-top:12px; width:100%; max-width:480px;">
+        Finalizar Partida
+      </button>
+    </div>
+
+    <!-- ===================================================
+         TELA FIM DE JOGO SOLO
+    ==================================================== -->
+    <div id="endSoloScreen" class="screen hidden">
+      <h1>Fim de Jogo!</h1>
+      <div class="form-card" style="text-align:center;">
+        <div class="score-final">
+          <span class="score-num" id="finalScoreSolo">0</span>
+          <span class="score-label">pontos</span>
+        </div>
+        <div class="btn-row" style="margin-top:24px;">
+          <button id="btnVerRanking">🏆 Ver Ranking</button>
+          <button class="btn-sec btn-voltar-home">← Início</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA FIM DE JOGO MULTI (PÓDIO)
+    ==================================================== -->
+    <div id="endMultiScreen" class="screen hidden">
+      <h1>🏆 Pódio Final</h1>
+      <div class="form-card">
+        <div id="podiumArea"></div>
+        <button class="btn-sec btn-voltar-home" style="margin-top:20px; width:100%;">← Voltar ao Início</button>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA RANKING
+    ==================================================== -->
+    <div id="rankingScreen" class="screen hidden">
+      <h1>Ranking Global</h1>
+      <div class="form-card" style="max-width:560px;">
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Jogador</th>
+              <th>Pontos</th>
+            </tr>
+          </thead>
+          <tbody id="rankingBody">
+            <tr><td colspan="3" style="text-align:center; color:var(--muted);">Carregando…</td></tr>
+          </tbody>
+        </table>
+        <button class="btn-sec btn-voltar-home" style="margin-top:20px; width:100%;">← Voltar</button>
+      </div>
+    </div>
+
+    <!-- ===================================================
+         TELA CADASTRAR TEMA
+    ==================================================== -->
+    <div id="createThemeScreen" class="screen hidden">
+      <h1>Novo Tema</h1>
+      <div class="form-card">
+        <div class="input-group">
+          <label for="nomeTemaNovo">Nome do Tema</label>
+          <input id="nomeTemaNovo" type="text" placeholder="Ex: Países do Mundo" />
+        </div>
+
+        <div class="sep-label">Adicionar primeira imagem (opcional)</div>
+
+        <div class="input-group">
+          <label for="urlImagemNova">URL da Imagem</label>
+          <input id="urlImagemNova" type="text" placeholder="https://..." />
+        </div>
+        <div class="input-group">
+          <label for="palavrasNova">Gabaritos (separados por vírgula)</label>
+          <input id="palavrasNova" type="text" placeholder="brasil, copa, futebol" />
+        </div>
+
+        <p id="themeMsg" class="msg-erro hidden"></p>
+
+        <div class="btn-row">
+          <button id="btnSalvarTema">💾 Salvar</button>
+          <button id="btnCancelarTema" class="btn-sec">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.painel -->
+
+  <!-- Socket.IO entregue pelo Flask-SocketIO -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="/static/script.js"></script>
+</body>
+</html>

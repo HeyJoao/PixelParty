@@ -131,39 +131,43 @@ def on_entrar_sala(dados):
 @socketio.on("palpite")
 def on_palpite(dados):
     pin = dados.get("pin")
-    palpite = dados.get("palpite")
-    
+    palpite = dados.get("palpite", "").strip()
+    nickname = dados.get("nickname") # Recuperamos direto do payload do Front-end
+
+    if not nickname:
+        emit("erro", {"mensagem": "Jogador não identificado no palpite."})
+        return
+
     sala = lobby.get(pin)
-    if not sala or not sala.partida:
+    if sala is None or sala.partida is None:
         emit("erro", {"mensagem": "Sala ou partida não encontrada."})
         return
 
-    # Tenta resgatar pelo sid_para_nickname, com fallback para o payload enviado pelo front
-    nickname = getattr(sala, "sid_para_nickname", {}).get(request.sid, dados.get("nickname"))
-
-    if not nickname:
-        emit("erro", {"mensagem": "Jogador não autenticado."})
-        return
-
-    # 👇 Despacha corretamente de acordo com a assinatura do método (Corrige o TypeError do Solo)
+    # Despacha corretamente de acordo com a assinatura do método da game_logic
     if isinstance(sala.partida, PartidaSolo):
+        # PartidaSolo espera apenas o palpite
         resultado = sala.partida.processar_palpite(palpite)
     else:
+        # PartidaMultiplayer espera o nickname e o palpite
         resultado = sala.partida.processar_palpite(nickname, palpite)
 
     if "erro" in resultado:
         emit("erro", resultado)
         return
 
+    # Resposta individual (vidas, resultado) — só para quem jogou
     emit("resultado_palpite", resultado["resposta_individual"])
     
+    # Broadcast do placar parcial para todos na sala
     if "placar_parcial" in resultado:
         emit("placar_atualizado", {"placar": resultado["placar_parcial"]}, to=pin)
 
+    # Se a rodada ou a partida acabou, avisa todos
     if resultado.get("broadcast") is not None:
         broadcast = resultado["broadcast"]
         emit("evento_rodada", broadcast, to=pin)
 
+        # Fim de partida: salva pontuações no banco
         if broadcast.get("evento") == "partida_encerrada":
             with app.app_context():
                 try:
